@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: queue-worker
+  namespace: demo
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: worker
+  template:
+    metadata:
+      labels:
+        app: worker
+    spec:
+      containers:
+      - name: worker
+        image: python:3.9
+        command: ["/bin/sh","-c"]
+        args:
+        #reads queue messages. 
+        - |
+          pip install redis && python -u - <<'EOF'
+          import redis, time
+          r = redis.Redis(host="redis.demo.svc.cluster.local", port=6379)
+
+          print("Worker started")
+
+          while True:
+              msg = r.lpop("orders")
+              if msg:
+                  print("Processing:", msg)
+                  time.sleep(2)
+              else:
+                  time.sleep(1)
+          EOF
