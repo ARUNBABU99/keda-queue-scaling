@@ -1,18 +1,17 @@
-Event-Driven Autoscaling in Kubernetes using KEDA
+**Event-Driven Autoscaling in Kubernetes using KEDA**
 
 This repo shows how to scale Kubernetes pods based on workload events instead of CPU or memory.
 
 We simulate a common production pattern:
 
 Queue → Worker Pods
-        ↑
-       KEDA
-
+         ↑
+        KEDA
 
 When jobs enter the queue → scale up
 When no jobs → scale to zero
 
-Why KEDA?
+**Why KEDA?**
 
 Traditional HPA reacts to resource usage.
 
@@ -34,7 +33,7 @@ CPU remains low while work is actually pending in a queue.
 
 Official docs: https://keda.sh
 
-What this demo uses
+**What this demo uses**
 
 Redis as job queue
 
@@ -42,35 +41,39 @@ Python worker consuming jobs
 
 KEDA Redis scaler
 
-Files in this repo
-File	Description
-redis-master.yaml	Redis queue
-consumer.yaml	Worker consuming messages
-scaledobject.yaml	KEDA scaling config
+**Files in this repo**
+| File              | Description               |
+| ----------------- | ------------------------- |
+| redis-master.yaml | Redis queue               |
+| consumer.yaml     | Worker consuming messages |
+| scaledobject.yaml | KEDA scaling config       |
+
+
 Run locally (Minikube)
 Start cluster
 minikube start
 minikube addons enable metrics-server  # Not needed in managed clusters like GKE/AKS
 
-Install KEDA
+**Install KEDA**
 helm repo add kedacore https://kedacore.github.io/charts
 helm repo update
 helm install keda kedacore/keda --namespace keda --create-namespace
 
-Deploy demo
+**Deploy demo**
 kubectl create ns demo
 kubectl apply -f redis-master.yaml
 kubectl apply -f consumer.yaml
 kubectl apply -f scaledobject.yaml
 
-Trigger scaling
+**Trigger scaling**
 
 Create temporary producer:
 
 kubectl run redis -it --rm --image redis -- bash
 
 
-Inside the pod:
+**Inside the pod:**
+
 
 redis-cli -h redis.demo.svc.cluster.local
 LPUSH orders job1 job2 job3 job4 job5 job6 job7 job8 job9 job10
@@ -100,7 +103,7 @@ It feeds external metrics into HPA
 
 Supported integrations
 
-KEDA supports many event sources:
+**KEDA supports many event sources:**
 
 Kafka
 
@@ -122,5 +125,5 @@ HTTP
 
 and more
 
-Full list:
+**Full list:**
 https://keda.sh/docs/latest/scalers/
